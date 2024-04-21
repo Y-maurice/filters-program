@@ -9,7 +9,7 @@ TEAM MEMBERS:
 ==========================================
 => NAME: Mary isaac hanna
    ID : 20230301
-   The parts she did: filters ( grey, lighten & darken, edge detect , merge )
+   The parts she did: filters ( grey, lighten & darken, edge detect , merge , Bonus(tv , oil painting))
    EMAIL : romaishak@gmail.com
 ==========================================
 =>NAME: youssef moris kamal
@@ -17,6 +17,10 @@ TEAM MEMBERS:
   The parts he did: filters ( invert , rotate , frame , blur , Bonus(sunlight)) & the whole menu 
   EMAIL : youssefmoris10@gmail.com
 ===========================================
+=>our project on github :
+
+https://github.com/Y-maurice/filters-program
+
 =>the figuer of the functions :
 
 https://drive.google.com/file/d/1mqbOwNmN8shzFuHdiCqRMg4OHg60fEiK/view?usp=drive_link
@@ -26,7 +30,7 @@ https://drive.google.com/file/d/1mqbOwNmN8shzFuHdiCqRMg4OHg60fEiK/view?usp=drive
 => changed the functions to return Image instead of void.
 => fixed the problem unloading the saved image in rotation 270 filter. 
 => made a validation in the inner options of some filters like (flipping , rotate , lighten & darken , merge ).
-=>added the functions of new filters(crop,resize,infrared,purple,frame,blur,sunlight,edge detect,merge)
+=> added the functions of new filters(crop,resize,infrared,purple,frame,blur,sunlight,edge detect,merge,tv,oil painting)
 */
 
 #include"Image_Class.h"
@@ -322,9 +326,9 @@ int rotation_choice;
 string input;
 regex validrotate("[123]") ;
 do{
-  cout<<"to rotate 90° , enter 1"<<endl
-  <<"to rotate 180° ,enter 2"<<endl
-  <<"to rotate 270° ,enter 3"<<endl;
+  cout<<"to rotate 90 , enter 1"<<endl
+  <<"to rotate 180 ,enter 2"<<endl
+  <<"to rotate 270 ,enter 3"<<endl;
   cin>>input;
  if(cin.fail() || !regex_match(input, validrotate)){
     cin.clear();
@@ -508,8 +512,8 @@ it according to the dimensions that the user wants */
 Image resize (Image x){
     string dimensions;
     cout<<"enter new dimensions as W*H: \n";
-    getline(cin,dimensions);
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cin>>dimensions;
+   
 
     int X, Y, W, H;
     char astr;
@@ -529,8 +533,7 @@ Image resize (Image x){
             }
         }
     }
-   return l;
-    
+    return l;
 }
 
 //==================================== purple ====================================>
@@ -636,50 +639,29 @@ edge and is colored black, otherwise it's colored white.*/
 
 Image edge_detect(Image x){
 
-        for (int i = 0; i < x.width; i++) {
-            for (int j = 0; j < x.height; j++) {
 
-                if (x(i, j, 0) + x(i, j, 1) + x(i, j, 2) > 127) {
-                    x(i, j, 0) = 225;
-                    x(i, j, 1) = 225;
-                    x(i, j, 2) = 225;
-                }
-                else {
-                    x(i, j, 0) = 0;
-                    x(i, j, 1) = 0;
-                    x(i, j, 2) = 0;
-
-                }
+    for (int i = 0; i < x.width - 1; i++) {
+        for (int j = 0; j < x.height - 1; j++) {
+           
+            int h_diff = abs(x(i, j, 0) - x(i, j + 1, 0));
+            int v_diff = abs(x(i, j, 0) - x(i + 1, j, 0));
+      
+            if (h_diff > 20 || v_diff > 20) {
+                x(i, j, 0) = 0;
+                x(i, j, 1) = 0;
+                x(i, j, 2) = 0;
+            }
+            else {
+               
+                x(i, j, 0) = 255;
+                x(i, j, 1) = 255;
+                x(i, j, 2) = 255;
             }
         }
-        
-        for (int i = 0; i < x.width-1; i++) {
-            for (int j = 0; j < x.height-1; j++) {
-
-                int h = abs(x(i, j, 0) - x(i, j + 1, 0));
-                int v = abs(x(i, j, 0) - x(i + 1, j, 0));
-                
-                if (h > 127 && v > 127) {
-
-                    for (int k = 0; k < 3; k++) {
-                        x(i, j, k) = 0;
-
-                    }
-                }
-                else {
-
-                    for (int k = 0; k < 3; k++) {
-                        x(i, j, k) = 255;
-
-                    }
-
-                }
-   
-            }
-        }
-
-   return x;     
+    }
+    return x;
 }
+
 
 //==================================== merge ====================================>
 
@@ -787,11 +769,94 @@ do{
 }
 
 
+//==================================== tv ====================================>
+
+Image tv(Image x) {
+
+
+        Image a(x.width, x.height);
+        Image b(x.width, x.height);
+       
+        for (int i = 0; i < a.width; i++) {
+            for (int j = 0; j < a.height; j++) {
+                for (int k = 0; k < 3; k++) {
+
+                    if (i % 2 == 0) {
+                        if (j % 2 == 0) {
+
+                            a(i, j, k) = 0;
+                        }
+                        else {
+
+                            a(i, j, k) = 255;
+                        }
+                    }
+
+                    else{
+
+                        if (j % 2 == 0) {
+
+                            a(i, j, k) = 255;
+                        }
+                        else {
+
+                            a(i, j, k) = 0;
+                        }
+                    }
+
+                }
+            }
+        }
+        
+
+        for (int i = 0; i < b.width; i++) {
+            for (int j = 0; j < b.height; j++) {
+                for (int k = 0; k < 3; k++) {
+
+                    b(i, j, k) = (x(i, j, k) + a(i, j, k)) / 2;
+
+                }
+            }
+        }
+        return b;
+
+
+
+}
+
+//==================================== oil painting ====================================>
+
+    Image oil_painting(Image x){
+    
+
+        for (int i = 0; i < x.width; i++) {
+            for (int j = 0; j < x.height; j++) {
+               
+                if (x(i, j, 0)> x(i, j, 1) && x(i, j, 0) > x(i, j, 2)) {               
+                    x(i, j, 1) = 0.8 * x(i, j, 1);
+                    x(i, j, 2) = 0.8 * x(i, j, 2);
+                }
+                if (x(i, j, 1) > x(i, j, 0) && x(i, j, 1) > x(i, j, 2)) {      
+                    x(i, j, 0) = 0.8 * x(i, j, 0);
+                    x(i, j, 2) = 0.8 * x(i, j, 2);
+                }
+                if (x(i, j, 2) > x(i, j, 1) && x(i, j, 2) > x(i, j, 0)) {                   
+                    x(i, j, 1) = 0.8 * x(i, j, 1);
+                    x(i, j, 0) = 0.8 * x(i, j, 0);
+                }
+
+
+            }
+        }
+        return x;
+}
+
+
 int main(){
 
 string input;
 regex validInputImage("[01]"); 
-regex validInputFilter("([0-9]|10|11|12|13|14|15)");//the valid inputs (from 0 to 12)
+regex validInputFilter("([0-9]|10|11|12|13|14|15|16|17)");//the valid inputs (from 0 to 12)
 // regex method to validate both the input of the filter and image
 int image_choice;
 Image x;
@@ -859,6 +924,8 @@ string image_name;
                  <<"Sunlight => 13"<<endl
                  <<"Edge detect => 14"<<endl
                  <<"Merge => 15"<<endl
+                 <<"Tv => 16"<<endl
+                 <<"oil painting => 17"<<endl
                  <<"Exit   => 0" << endl;
             cin >> input;
 
@@ -938,6 +1005,14 @@ string image_name;
 
             case 15 :
             saveph(merge(x));
+            break;
+
+            case 16 :
+            saveph(tv(x));
+            break;
+
+            case 17 :
+            saveph(oil_painting(x));
             break;
         }
      
